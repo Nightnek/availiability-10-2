@@ -32,14 +32,42 @@ listen web_tcp
         server s2 127.0.0.1:9999 check inter 3s
 ````
 
-![image](https://github.com/Nightnek/availiability-10-2/assets/127677631/e642235e-5e8f-4e68-b919-6f090fc8def4)
+![image](https://github.com/Nightnek/availiability-10-2/assets/127677631/0e9d116a-f5cc-449f-b14a-08e5592f2f58)
+
 
 
 ---
 
 ## Задание 2
 
- 
+![image](https://github.com/Nightnek/availiability-10-2/assets/127677631/ff003475-686e-48f1-a97c-afe7ebb6f314)
+
+
+````
+listen stats  # веб-страница со статистикой
+        bind                    :888
+        mode                    http
+        stats                   enable
+        stats uri               /stats
+        stats refresh           5s
+        stats realm             Haproxy\ Statistics
+
+frontend example  # секция фронтенд
+        mode http
+        bind :8088
+        #default_backend web_servers
+        acl ACL_example.local hdr(host) -i example.local
+        use_backend web_servers if ACL_example.local
+
+backend web_servers    # секция бэкенд
+        mode http
+        balance roundrobin
+        option httpchk
+        http-check send meth GET uri /index.html
+        server s1 127.0.0.1:8888 check weight 2
+        server s2 127.0.0.1:9999 check weight 3
+        server s3 127.0.0.1:7777 check weight 4
+````
 
 ---
 
